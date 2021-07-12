@@ -95,7 +95,7 @@ This problem was asked by Facebook.
 Given a string and a set of delimiters, reverse the words in the string while maintaining the relative order of the delimiters. For example, given "hello/world:here", return "here/world:hello"
 Follow-up: Does your solution work for the following cases: "hello/world:here/", "hello//world:here"
 
-## 112 
+## 112
 
 This problem was asked by Twitter.
 Given a binary tree, find the lowest common ancestor (LCA) of two given nodes in the tree. Assume that each node in the tree also has a pointer to its parent.
@@ -165,6 +165,7 @@ Given a list, sort it using this method: reverse(lst, i, j), which reverses lst 
 ## 153
 
 Find an efficient algorithm to find the smallest distance (measured in number of words) between any two given words in a string.
+
 For example, given words "hello", and "world" and a text content of "dog cat hello cat dog dog hello cat world", return 1 because there's only one word "cat" in between the two words.
 
 ## 178
@@ -179,7 +180,7 @@ The second game: same, except that the stopping condition is a five followed by 
 
 Which of the two games should Alice elect to play? Does it even matter? Write a program to simulate the two games and calculate their expected value.
 
-## 160 
+## 160
 
 his problem was asked by Uber.
 Given a tree where each edge has a weight, compute the length of the longest path in the tree.
@@ -245,7 +246,7 @@ And i1 = 1, j1 = 1, i2 = 3, j2 = 3, return 15 as there are 15 numbers in the mat
 
 This problem was asked by Facebook.
 
-Given a string of parentheses, find the balanced string that can be produced from it using the minimum number of insertions and deletions. If there are multiple solutions, return any of them. 
+Given a string of parentheses, find the balanced string that can be produced from it using the minimum number of insertions and deletions. If there are multiple solutions, return any of them.
 
 For example, given "(()", you could return "(())". Given "))()(", you could return "()()()()".
 
@@ -338,7 +339,7 @@ def _max(a, b):
         m = abs(a+1)//abs(b+1)
     try:
         m //= m
-    except: 
+    except:
         pass
     d = {
         (-1, 1, 0): b,
@@ -409,20 +410,20 @@ If the pattern is found, return the start index of its location. If not, return 
 
 ## 286
 
-The skyline of a city is composed of several buildings of various widths and heights, possibly overlapping one another when viewed from a distance. 
+The skyline of a city is composed of several buildings of various widths and heights, possibly overlapping one another when viewed from a distance.
 
-We can represent the buildings using an array of (left, right, height) tuples, which tell us where on an imaginary x-axis a building begins and ends, and how tall it is. 
+We can represent the buildings using an array of (left, right, height) tuples, which tell us where on an imaginary x-axis a building begins and ends, and how tall it is.
 
 The skyline itself can be described by a list of (x, height) tuples, giving the locations at which the height visible to a distant observer changes, and each new height.
 
 Given an array of buildings as described above, create a function that returns the skyline.
 
-For example, suppose the input consists of the buildings [(0, 15, 3), (4, 11, 5), (19, 23, 4)]. In aggregate, these buildings would create a skyline that looks like the one below. 
+For example, suppose the input consists of the buildings [(0, 15, 3), (4, 11, 5), (19, 23, 4)]. In aggregate, these buildings would create a skyline that looks like the one below.
 
 ```
-     ______  
+     ______
     |      |        ___
- ___|      |___    |   | 
+ ___|      |___    |   |
 |   |   B  |   |   | C |
 | A |      | A |   |   |
 |   |      |   |   |   |
@@ -437,6 +438,8 @@ As a result, your function should return [(0, 3), (4, 5), (11, 3), (15, 0), (19,
 Google.
 
 The game of Nim is played as follows. Starting with three heaps, each containing a variable number of items, two players take turns removing one or more items from a single pile. The player who eventually is forced to take the last stone loses. For example, if the initial heap sizes are 3, 4, and 5, a game could be played as shown below:
+
+```
   A  |  B  |  C
 -----------------
   3  |  4  |  5
@@ -444,8 +447,11 @@ The game of Nim is played as follows. Starting with three heaps, each containing
   3  |  1  |  3
   0  |  1  |  3
   0  |  1  |  0
-  0  |  0  |  0 
+  0  |  0  |  0
+```
+
 In other words, to start, the first player takes three items from pile B. The second player responds by removing two stones from pile C. The game continues in this way until player one takes last stone and loses.
+
 Given a list of non-zero starting values [a, b, c], and assuming optimal play, determine whether the first player has a forced win.
 
 ## 292
@@ -495,7 +501,7 @@ First left node is tree[1]
 First right node is tree[2]
 the usul rule is : tree[<parent>] => left:tree[<parent>*2+1] , right:tree[<parent>*2+2]
 
-Let's create a generator to get the mapping between the 2 lists. 
+Let's create a generator to get the mapping between the 2 lists.
 The generator is visiting the binary tree in order to generate a sorted array.
 So we just have to map the list back to the tree.
 """
@@ -514,7 +520,7 @@ def make_tree(arr):
     tree = [None] * l
     for i, g in enumerate(gen(l)):
             tree[g] = arr[i]
-        
+
     return tree
 
 ```
@@ -546,7 +552,7 @@ Let us consider a "move" to be a rotation of a single wheel by one digit, in eit
 This problem was asked by Apple.
 You are going on a road trip, and would like to create a suitable music playlist. The trip will require N songs, though you only have M songs downloaded, where M < N. A valid playlist should select each song at least once, and guarantee a buffer of B songs between repeats.
 Given N, M, and B, determine the number of valid playlists.
- 
+
 ## 319
 
 This problem was asked by Airbnb.
@@ -566,11 +572,11 @@ For example, given the sequence [3, 2, 6, 1, 9], the resulting Cartesian tree wo
 
 ```
       1
-    /   \   
+    /   \
   2       9
  / \
 3   6
-``` 
+```
 Given a sequence S, construct the corresponding Cartesian tree.
 
 ## 330
@@ -641,11 +647,11 @@ You are given a tree with an even number of nodes. Consider each connection betw
 
 For example, suppose your input was the following tree:
 
-``` 
+```
    1
-  / \ 
+  / \
  2   3
-    / \ 
+    / \
    4   5
  / | \
 6  7  8
@@ -1027,7 +1033,7 @@ You must buy before you can sell the stock, but you can make as many transaction
 
 For example, given [1, 3, 2, 8, 4, 10] and fee = 2, you should return 9, since you could buy the stock at 1 dollar, and sell at 8 dollars, and then buy it at 4 dollars and sell it at 10 dollars. Since we did two transactions, there is a 4 dollar fee, so we have 7 + 6 = 13 profit minus 4 dollars of fees.
 
-## 425 
+## 425
 
 This problem was asked by Oracle.
 
@@ -1068,7 +1074,7 @@ Given a string of parentheses, find the balanced string that can be produced fro
 
 For example, given "(()", you could return "(())". Given "))()(", you could return "()()()()".
 
-## 432 
+## 432
 
 This problem was asked by Google.
 
@@ -1114,7 +1120,7 @@ For example, given the sequence `[3, 2, 6, 1, 9]`, the resulting Cartesian tree 
 
 ```
       1
-    /   \   
+    /   \
   2       9
  / \
 3   6
@@ -1199,7 +1205,7 @@ This problem was asked by Google.
 
 Implement a file syncing algorithm for two computers over a low-bandwidth network. What if we know the files in the two computers are mostly the same?
 
-## 485 
+## 485
 
 This problem was asked by Amazon.
 
@@ -1270,9 +1276,9 @@ Given an array of buildings as described above, create a function that returns t
 For example, suppose the input consists of the buildings [(0, 15, 3), (4, 11, 5), (19, 23, 4)]. In aggregate, these buildings would create a skyline that looks like the one below.
 
 ```
-     ______  
+     ______
     |      |        ___
- ___|      |___    |   | 
+ ___|      |___    |   |
 |   |   B  |   |   | C |
 | A |      | A |   |   |
 |   |      |   |   |   |
@@ -1287,7 +1293,7 @@ This problem was asked by YouTube.
 
 Write a program that computes the length of the longest common subsequence of three given strings. For example, given "epidemiologist", "refrigeration", and "supercalifragilisticexpialodocious", it should return `5`, since the longest common subsequence is "eieio".
 
-## 238 
+## 238
 
 This problem was asked by MIT.
 
@@ -1377,3 +1383,17 @@ And here are examples of non-numbers:
 * "a -2"
 * "-"
 
+## 763
+
+This problem was asked by Google.
+
+Given an array of integers and a number k, where 1 <= k <= length of the array, compute the maximum values of each subarray of length k.
+
+For example, given array = [10, 5, 2, 7, 8, 7] and k = 3, we should get: [10, 7, 8, 8], since:
+
+* 10 = max(10, 5, 2)
+* 7 = max(5, 2, 7)
+* 8 = max(2, 7, 8)
+* 8 = max(7, 8, 7)
+
+Do this in O(n) time and O(k) space. You can modify the input array in-place and you do not need to store the results. You can simply print them out as you compute them.

@@ -49,7 +49,7 @@ def common_node(A, B):
 
 ## 26 Linked Lists Removing
 
-Given a singly linked list and an integer k, remove the kth last element from the list. k is guaranteed to be smaller than the length of the list.
+Given a singly linked list and an integer k, remove the k<sup>th</sup> last element from the list. k is guaranteed to be smaller than the length of the list.
 
 The list is very long, so making more than one pass is prohibitively expensive.
 
@@ -61,7 +61,7 @@ Given `start` as the start of the linked list and `k` as from problem definition
 
 ```python
 def sol(start, k):
-    ptr_k = ptr_curr = start 
+    ptr_k = ptr_curr = start
     while ptr_curr.next:
         if k == 0:
             ptr_k = ptr_k.next
@@ -99,11 +99,11 @@ for position in range(51):
 
 ## 53 Queue
 
-Implement a queue using two stacks. 
+Implement a queue using two stacks.
 
-Recall that a queue is a FIFO (first-in, first-out) data structure with the following methods: 
+Recall that a queue is a FIFO (first-in, first-out) data structure with the following methods:
 
-* `enqueue`, which inserts an element into the queue, and 
+* `enqueue`, which inserts an element into the queue, and
 * `dequeue`, which removes it.
 
 ### Solution
@@ -285,7 +285,7 @@ def merge(list_of_linked_lists):
     return output
 ```
 
-## 79 
+## 79
 
 Given an array of integers, write a function to determine whether the array could become non-decreasing by modifying at most 1 element.
 
@@ -304,7 +304,7 @@ For example, given the following tree:
     a
    / \
   b   c
- / \  / 
+ / \  /
 d   e f
 ```
 should become:
@@ -338,8 +338,8 @@ This problem was asked by Facebook.
 Given three 32-bit integers x, y, and b, return x if b is 1 and y if b is 0, using only mathematical or bit operations. You can assume b can only be 1 or 0.
 
 ```cpp
-return (x * b) | ((1-b) * y); 
-``` 
+return (x * b) | ((1-b) * y);
+```
 
 
 ## 86
@@ -422,7 +422,7 @@ Bonus: Can you do this in one line?
          swap 1 with 2 and so on ...  swap 2 with 1 and so on
 out_word = ((in_word & 0x55) << 1) | ((in_word & 0xAA) >> 1)
 
-## 106 
+## 106
 
 This problem was asked by Pinterest.
 Given an integer list where each number represents the number of hops you can make, determine whether you can reach to the last index starting at index 0.
@@ -554,7 +554,7 @@ def generate():
 
 ```
 
-## 119 
+## 119
 
 This problem was asked by Google.
 Given a set of closed intervals, find the smallest set of numbers that covers all the intervals. If there are multiple smallest sets, return any of them.
@@ -607,7 +607,7 @@ def sol(m):
                     stack.append(State(p.x+1, p.y, p.sum+m[p.y][p.x]))
                 if p.y < len(m)-1:
                     stack.append(State(p.x, p.y+1, p.sum+m[p.y][p.x]))
-    
+
     return max(all())
 
 print(sol(matrix))
@@ -681,7 +681,7 @@ Return 4.
 ## 137
 
 This problem was asked by Amazon.
- 
+
 Implement a bit array.
 
 A bit array is a space efficient array that holds a value of 1 or 0 at each index.
@@ -758,7 +758,7 @@ This problem was asked by Google.
 Given an array of numbers and an index i, return the index of the nearest larger number of the number at index i, where distance is measured in array indices.
 For example, given [4, 1, 3, 5, 6] and index 0, you should return 3.
 If two distances to larger numbers are the equal, then return any one of them. If the array at i doesn't have a nearest larger integer, then return null.
-Follow-up: If you can preprocess the array, can you do this in constant time? 
+Follow-up: If you can preprocess the array, can you do this in constant time?
 
 ## 151
 
@@ -917,7 +917,7 @@ Right, down, down, right
 Down, right, down, right
 The top left corner and bottom right corner will always be 0.
 
-## 156 
+## 156
 
 
 This problem was asked by Facebook.
@@ -947,7 +947,7 @@ Suppose an array sorted in ascending order is rotated at some pivot unknown to y
 
 For example, given [5, 7, 10, 3, 4], return 3.
 
-## 198 
+## 198
 
 This problem was asked by Google.
 Given a set of distinct positive integers, find the largest subset such that every pair of elements in the subset (i, j) satisfies either i % j = 0 or j % i = 0.
@@ -968,9 +968,12 @@ For example, given the linked list `5 -> 1 -> 8 -> 0 -> 3` and `k = 3`, the solu
 ## 213
 
 This problem was asked by Snapchat.
+
 Given a string of digits, generate all possible valid IP address combinations.
+
 IP addresses must follow the format A.B.C.D, where A, B, C, and D are numbers between 0 and 255. Zero-prefixed numbers, such as 01 and 065, are not allowed, except for 0 itself.
-For example, given "2542540123", you should return ['254.25.40.123', '254.254.0.123'].
+
+For example, given `"2542540123"`, you should return `['254.25.40.123', '254.254.0.123']`.
 
 ## 211
 
@@ -1043,7 +1046,8 @@ Write a program that returns the maximum amount of money you can win with certai
 ## 228
 
 This problem was asked by Twitter.
-Given a list of numbers, create an algorithm that arranges them in order to form the largest possible integer. For example, given [10, 7, 76, 415], you should return 77641510.
+
+Given a list of numbers, create an algorithm that arranges them in order to form the largest possible integer. For example, given `[10, 7, 76, 415]`, you should return `77641510`.
 
 ## 229
 
@@ -1083,7 +1087,7 @@ This problem was asked by Dropbox.
 
 Given a list of words, determine whether the words can be chained to form a circle. A word X can be placed in front of another word Y in a circle if the last character of X is same as the first character of Y.
 
-For example, the words `['chair', 'height', 'racket', 'touch', 'tunic']` can form 
+For example, the words `['chair', 'height', 'racket', 'touch', 'tunic']` can form
 the following circle: `chair --> racket --> touch --> height --> tunic --> chair`.
 
 ```python
@@ -1091,7 +1095,7 @@ the following circle: `chair --> racket --> touch --> height --> tunic --> chair
 def sol(l):
     stack = [([x], l[:i]+l[i+1:]) for i, x in enumerate(l)]
     yielded = set()
-    
+
     while stack:
         chain, words = stack.pop()
         if not words:
@@ -1107,7 +1111,7 @@ def sol(l):
                     chain2 = chain + [w]
                     words2 = words[:i]+words[i+1:]
                     stack.append((chain2, words2))
-    
+
 print(list(sol(['chair', 'height', 'racket', 'touch', 'tunic'])))
 
 ```
@@ -1133,7 +1137,7 @@ Given an array of a million integers between zero and a billion, out of order, h
 ## 253
 
 This problem was asked by PayPal.
-Given a string and a number of lines k, print the string in zigzag form. In zigzag, characters are printed out diagonally from top left to bottom right until reaching the kth line, then back up to top right, and so on. 
+Given a string and a number of lines k, print the string in zigzag form. In zigzag, characters are printed out diagonally from top left to bottom right until reaching the kth line, then back up to top right, and so on.
 For example, given the sentence "thisisazigzag" and k = 4, you should print:
 t     a     g
  h   s z   a
@@ -1210,7 +1214,7 @@ Given a 32-bit positive integer N, determine whether it is a power of four in fa
 
 This problem was asked by Twitter.
 A network consists of nodes labeled 0 to N. You are given a list of edges (a, b, t), describing the time t it takes for a message to be sent from node a to node b. Whenever a node receives a message, it immediately passes the message on to a 7neighboring node, if possible.
-Assuming all nodes are connected, determine how long it will take for every node to receive a message that begins at node 0. 
+Assuming all nodes are connected, determine how long it will take for every node to receive a message that begins at node 0.
 For example, given N = 5, and the following edges:
 edges = [
     (0, 1, 5),
@@ -1273,7 +1277,7 @@ Two nodes in a binary tree can be called cousins if they are on the same level o
 4   5   6
 ```
 
-Given a binary tree and a particular node, find all cousins of that node. 
+Given a binary tree and a particular node, find all cousins of that node.
 
 ## 287
 
@@ -1317,7 +1321,7 @@ Write a function that returns how many steps this will take for a given input N.
 
 This problem was asked by Glassdoor.
 An imminent hurricane threatens the coastal town of Codeville. If at most two people can fit in a rescue boat, and the maximum weight limit for a given boat is k, determine how many boats will be needed to save everyone.
-For example, given a population with weights [100, 200, 150, 80] and a boat limit of 200, the smallest number of boats required will be three. 
+For example, given a population with weights [100, 200, 150, 80] and a boat limit of 200, the smallest number of boats required will be three.
 
 ## 294
 
@@ -1470,7 +1474,7 @@ def sol(n):
     if m:
         ret[m-1] = -ret[m-1]
     return ret
-        
+
 
 print(sol(89))
 ```
@@ -1489,7 +1493,7 @@ In chess, the Elo rating system is used to calculate player strengths based on g
 A simplified description of the Elo system is as follows. Every player begins at the same score. For each subsequent game, the loser transfers some points to the winner, where the amount of points transferred depends on how unlikely the win is. For example, a 1200-ranked player should gain much more points for beating a 2000-ranked player than for beating a 1300-ranked player.
 Implement this system.
 
-## 331
+## 331 (dup 460)
 
 This problem was asked by LinkedIn.
 
@@ -1559,7 +1563,7 @@ Given a binary search tree and a range [a, b] (inclusive), return the sum of the
 
 For example, given the following tree:
 
-``` 
+```
     5
    / \
   3   8
@@ -1628,7 +1632,7 @@ You are given a histogram consisting of rectangles of different heights. These h
 
 ```
       x
-      x  
+      x
   x   x
   x x x
 x x x x
@@ -1636,11 +1640,11 @@ x x x x
 
 Determine the area of the largest rectangle that can be formed only from the bars of the histogram. For the diagram above, for example, this would be six, representing the `2 x 3` area at the bottom right.
 
-## 360 
+## 360
 
 This problem was asked by Spotify.
 
-You have access to ranked lists of songs for various users. Each song is represented as an integer, and more preferred songs appear earlier in each list. For example, the list `[4, 1, 7]` indicates that a user likes song 4 the best, followed by songs 1 and 7.
+You have access to ranked lists of songs for various users. Each song is represented as an integer, and more preferred songs appear earlier in each list. For example, the list `[4, 1, 7]` indicates that a user likes song `4` the best, followed by songs `1` and `7`.
 
 Given a set of these ranked lists, interleave them to create a playlist that satisfies everyone's priorities.
 
@@ -1829,7 +1833,7 @@ This problem was asked by Two Sigma.
 
 You are given an unsorted list of 999,000 unique integers, each from 1 and 1,000,000. Find the missing 1000 numbers. What is the computational and space complexity of your solution?
 
-## 393 
+## 393
 
 This problem was asked by Airbnb.
 
@@ -1887,7 +1891,7 @@ Given an array of numbers representing the stock prices of a company in chronolo
 
 For example, given k = 2 and the array [5, 2, 4, 0, 1], you should return 3.
 
-## 412 
+## 412
 
 This problem was asked by Epic.
 
@@ -2394,7 +2398,7 @@ class Node:
         self.left = left
         self.right = right
 ```
-    
+
 The following test should pass:
 
 ```
@@ -2405,10 +2409,10 @@ assert deserialize(serialize(node)).left.left.val == 'left.left'
 
 ## 758 This problem was asked by Facebook.
 
-Write a function that rotates a list by k elements. 
+Write a function that rotates a list by k elements.
 
-For example, [1, 2, 3, 4, 5, 6] rotated by two becomes [3, 4, 5, 6, 1, 2]. 
+For example, [1, 2, 3, 4, 5, 6] rotated by two becomes [3, 4, 5, 6, 1, 2].
 
-Try solving this without creating a copy of the list. 
+Try solving this without creating a copy of the list.
 
 How many swap or move operations do you need?

@@ -58,23 +58,23 @@ Hint: What if we enter the same URL twice?
 ### Discussion
 
 First let's compute how many url can we short this way.
-With figures like 'A..Za..z0..9', let's remove {i, I, l, L, o, O, 0, 1}, because is easy to miread them, we can have 56 figures
+With figures like 'A..Za..z0..9', let's remove {i, I, l, L, o, O, 0, 1}, because is easy to misread them, we can have 56 figures
 
 ```python
 cifer = 'abcdefghjklmnpqrstuvxywzABCDEFGHJKLMNPQRSTUVXYWZ23456789'
 
-def tocode(n): 
-    ret  = '' 
-    for i in range(6): 
-        ret = cifer[n%len(cifer)] + ret 
-        n //= len(cifer) 
+def tocode(n):
+    ret  = ''
+    for i in range(6):
+        ret = cifer[n%len(cifer)] + ret
+        n //= len(cifer)
     return ret
-                                             
 
-tocode(0)                                    
+
+tocode(0)
 # 'aaaaaa'
 
-tocode(56**6-1)     
+tocode(56**6-1)
 # '999999'
 
 ```
@@ -83,9 +83,9 @@ So we can have 56<sup>6</sup> codes. 30_840_979_456 a little bit less than 31 bi
 
 Multiplying this by a resonable average of url lenght (64 bytes), we need to store 1_973_822_685_184 => 2 Petabytes of urls. We can't do this in memory so let's store it on an S3 like storage, our file will be called like the sorten version.
 
-We must compute an hash of the url, distributed 0..30_840_979_455 and store the url in a file with name computed with the `tocode` function. 
+We must compute an hash of the url, distributed 0..30_840_979_455 and store the url in a file with name computed with the `tocode` function.
 
-When we save the url, We check if the file is there. If not, we erite it. DONE
+When we save the url, We check if the file is there. If not, we write it. DONE
   If we find already a file, we check the content. If it is equel, we are DONE
     If the content is differente we compute the next hash, with an evolving function. next = (hash + 4_405_854_209) % 30_840_979_456  (4_405_854_208 is a 7th of 30_840_979_456 )
 
@@ -207,7 +207,7 @@ while matrix:
         print(x)
     matrix = matrix[1:]
     if matrix:
-        matrix = [x[::-1] for x in zip(*matrix[::-1])][::-1]
+        matrix = [x[::-1] for x in zip(*matrix[::-1])][::-1]  # matrix rotation
 
 ```
 
@@ -218,6 +218,29 @@ Print first row, rotate and go on, until run out of matrix
 Given a list of integers, return the largest product that can be made by multiplying any three integers.
 For example, if the list is [-10, -10, 5, 2], we should return 500, since that's -10 * -10 * 5.
 You can assume the list has at least three integers.
+
+### Discussion
+The idea is to sort the list.
+
+If we have only positive numbers, or only negatives numbers, we take the biggest 3 numbers.
+
+If we have at least 2 negative numbers, we computer their product and we compare it with the product of the biggest 2 positive numbers; if the product is bigger, we use them, else we don't.
+
+At this point we multiply by the largest number of the list.
+
+### Solution
+
+```python
+
+def largest_product(l):
+    numbers = sorted(l)
+    ret = numbers[-1]*numbers[-2]*numbers[-3]  # the input always contain at least 3 elements
+    if all(x<0 for x in numbers):
+        return ret
+    if numbers[0]*numbers[1]*numbers[-1] > ret:  # test in the case we have 2 negatives number
+        ret = numbers[0]*numbers[1]*numbers[-1]
+    return ret
+```
 
 ## Product of numbers
 
@@ -281,7 +304,7 @@ for x in input_list[::-1]:
     p *= x
 ```
 
-and we get 
+and we get
 
 ```python
 prod_array == [1, 1, 2, 6, 24]
@@ -330,6 +353,55 @@ For example, given the following tree:
 
 You should return 45, as it is `(3 + 2) * (4 + 5)`.
 
+### Solution 
+
+Given the tree as a list
+['*', '+', '+', 3, 2, 4, 5]
+
+```python
+tree = ['*', '+', '+', 3, 2, 4, 5]
+
+def walk(tree, p):
+    if p<len(tree) and tree[p] is not None:
+        yield from walk(tree,p*2+1)  # left
+        yield from walk(tree,p*2+2)  # right
+        yield tree[p]
+
+>>> list(walk(tree,0))
+
+ [3, 2, '+', 4, 5, '+', '*']
+
+```
+
+now we have the RPN of our tree, that we evaluate with a stack
+
+```python
+from collections import deque
+
+def compute(l):
+    ops = {
+        '+': lambda a,b: a+b,
+        '-': lambda a,b: a-b,
+        '*': lambda a,b: a*b,
+        '/': lambda a,b: a/b,
+    }
+    stack = deque()
+    for c in l:
+        ret = c
+        if c in ops:
+            b = stack.pop()
+            a = stack.pop()
+            ret = ops[c](a,b)
+        stack.append(ret)
+
+    return stack.pop()
+
+>>> compute(walk(tree,0))
+
+45
+
+```
+
 ## 73
 
 This problem was asked by Google.
@@ -339,24 +411,83 @@ Given the head of a singly linked list, reverse it in-place.
 def reverse(node, prev_node = None):
     if node:
         next_node = node.next
-        node.next = prec_node
+        node.next = prev_node
         reverse(next_node, node)
 ```
 
 ## 71
 
 This problem was asked by Two Sigma.
-Using a function rand7() that returns an integer from 1 to 7 (inclusive) with uniform probability, implement a function rand5() that returns an integer from 1 to 5 (inclusive).
 
+Using a function rand7() that returns an integer from 1 to 7 (inclusive) with uniform probability, implement a function rand5() that returns an integer from 1 to 5 (inclusive) with uniform probability.
+
+### Simple solution
 ```python
+def rand5():
+    ret = 7
+    while ret>5:
+        ret = rand7()
+    return ret
 ```
 
+### Math solution
+
+Imagine a matrix 7 by 7, we can think of it as an array of 49 elements, that is linear.
+We chose a cell with uniform probability using rand7.
+then we have to take this number 0..48 and do modulo 5.
+But we have to discard the tail of the array, because this would make the probability not uniform anymore.
+So we keep 0..44 and we 'roll again' is we get a number bigger than 44.
+
+```python
+def rand5():
+    idx = 48
+    while idx>44:
+        idx = rand7()*7+rand7()
+    return 1+(idx%5)
+```
+
+## 71 reverse
+
+Using a function rand5() that returns an integer from 1 to 5 (inclusive) with uniform probability, implement a function rand7() that returns an integer from 1 to 7 (inclusive) with uniform probability.
+
+```python
+def rand7():
+    idx = 24
+    while idx>20:
+        idx = rand5()*5+rand5()
+    return 1+(idx%7)
+```
+ 
 ## 70
 
 This problem was asked by Microsoft.
+
 A number is considered perfect if its digits sum up to exactly 10.
+
 Given a positive integer n, return the n-th perfect number.
+
 For example, given 1, you should return 19. Given 2, you should return 28.
+
+### Note
+The biggest perfect number is 11_111_111_110
+
+### Solution
+```python
+def perferct_number(end):
+    n = 1
+    while n<=1_111_111_111:
+        m=n
+        _sum=0
+        while m:
+            _sum+=m%10
+            m//=10
+        last = 10-_sum
+        if 0<=last<10:
+            end-=1
+            if end == 0:
+                return n*10+last
+        n+=1
+```
 
 ## 72 hard
 
@@ -379,7 +510,9 @@ Should return null, since we have an infinite loop.
 ## 45
 
 This problem was asked by Amazon.
+
 Given a string, find the longest palindromic contiguous substring. If there are more than one with the maximum length, return any one.
+
 For example, the longest palindromic substring of "aabcdcb" is "bcdcb". The longest palindromic substring of "bananas" is "anana".
 
 ```python
@@ -390,7 +523,7 @@ def fx(s):
     while start+l<=len(s):
         rev = s[start+l-1:start-1:-1]
         if start==0:
-            rev = s[l-1::-1] 
+            rev = s[l-1::-1]
         if s[start:start+l] == rev and l>len(ret):
             ret = s[start:start+l]
         l += 1
@@ -403,9 +536,13 @@ def fx(s):
 ##  44
 
 This problem was asked by Google.
+
 We can determine how "out of order" an array A is by counting the number of inversions it has. Two elements A[i] and A[j] form an inversion if A[i] > A[j] but i < j. That is, a smaller element appears after a larger element.
+
 Given an array, count the number of inversions it has. Do this faster than O(N^2) time.
+
 You may assume each element in the array is distinct.
+
 For example, a sorted list has zero inversions. The array [2, 4, 1, 3, 5] has three inversions: (2, 1), (4, 1), and (4, 3). The array [5, 4, 3, 2, 1] has ten inversions: every distinct pair forms an inversion.
 
 
@@ -652,10 +789,14 @@ Given a mapping of digits to letters (as in a phone number), and a digit string,
 
 For example if {“2”: [“a”, “b”, “c”], 3: [“d”, “e”, “f”], …} then “23” should return [“ad”, “ae”, “af”, “bd”, “be”, “bf”, “cd”, “ce”, “cf"].
 
-== 82
+## 82
+
+This problem was asked Microsoft.
 
 Using a read7() method that returns 7 characters from a file, implement readN(n) which reads n characters.
-For example, given a file with the content “Hello world”, three read7() returns “Hello w”, “orld” and then “”.
+
+For example, given a file with the content `“Hello world”`, three `read7()` returns
+`“Hello w”, “orld”` and then `“”`.
 
 ## 91
 
@@ -707,10 +848,10 @@ def recursive_solution(grid, x, y, used, word):
     for dx, dy in ((0,1),(1,0),(-1,0),(0,-1)):
         nx = x + dx
         ny = y + dy
-        if nx<0 or ny<0 or nx>len(grid[0])-1 or ny>len(grid)-1 or (nx,ny) in used:        
+        if nx<0 or ny<0 or nx>len(grid[0])-1 or ny>len(grid)-1 or (nx,ny) in used:
             continue
 
-        if grid[ny][nx] == first_letter:            
+        if grid[ny][nx] == first_letter:
             ret = recursive_solution(grid, nx, ny, used | {(nx,ny)}, word[1:])
             if ret:
                 return True
@@ -723,7 +864,7 @@ def exists(grid, word):
     first_letter = word[0]
     for y, row in enumerate(grid):
         for x, cell in enumerate(row):
-            if cell==first_letter: 
+            if cell==first_letter:
                 ret = recursive_solution(grid, x, y, {(x,y)}, word[1:])
                 if ret:
                     return True
@@ -736,7 +877,7 @@ def stack_exists(grid, word):
     stack = []  # here a deque would be better
     for y, row in enumerate(grid):
         for x, cell in enumerate(row):
-            if cell==first_letter: 
+            if cell==first_letter:
                 stack.append((x, y, {(x,y)}, word[1:]))
     while stack:
         x, y, used, w = stack.pop()
@@ -747,10 +888,10 @@ def stack_exists(grid, word):
         for dx, dy in ((0,1),(1,0),(-1,0),(0,-1)):
             nx = x + dx
             ny = y + dy
-            if nx<0 or ny<0 or nx>len(grid[0])-1 or ny>len(grid)-1 or (nx,ny) in used:        
+            if nx<0 or ny<0 or nx>len(grid[0])-1 or ny>len(grid)-1 or (nx,ny) in used:
                 continue
 
-            if grid[ny][nx] == first_letter:     
+            if grid[ny][nx] == first_letter:
                 stack.append((nx, ny, used | {(nx,ny)}, w[1:]))
 
     return False
@@ -770,7 +911,7 @@ assert (
 assert (
     solution(
         [
-        ['A','B','C','E'],        
+        ['A','B','C','E'],
         ['S','F','C','S'],
         ['A','D','E','E'],
         ],
@@ -803,7 +944,7 @@ assert (
 assert (
     stack_solution(
         [
-        ['A','B','C','E'],        
+        ['A','B','C','E'],
         ['S','F','C','S'],
         ['A','D','E','E'],
         ],
@@ -842,7 +983,7 @@ Input: [(0, 0), (1, 1), (1, 2)]
 Output: 2
 It takes 1 step to move from (0, 0) to (1, 1). It takes one more step to move from (1, 1) to (1, 2).
 
-## 101 
+## 101
 
 This problem was asked by Alibaba.
 Given an even number (greater than 2), return two prime numbers whose sum will be equal to the given number.
@@ -919,7 +1060,7 @@ for i, x in enumerate(tree):
     if x is not None:
         dict_tree[i] = x
 
-dict_tree = { i:x for i, x in enumerate(tree) if x is not None }        
+dict_tree = { i:x for i, x in enumerate(tree) if x is not None }
 
 def search(dict_tree, n, skip):
     ptr = 0
@@ -933,15 +1074,15 @@ def search(dict_tree, n, skip):
     return None
 
 def solve(tree, k):
-    dict_tree = { i:x for i, x in enumerate(tree) if x is not None }        
-    
+    dict_tree = { i:x for i, x in enumerate(tree) if x is not None }
+
     for p1, value in dict_tree.items():
         p2 = search(dict_tree, k-value, p1)
         if p2 is not None:
             return value, k-value, p1, p2
-    
+
     return None, None, None, None
-    
+
 ```
 
 COMPLEXITY: O( n lg(n) )
@@ -970,7 +1111,7 @@ def solve(tree, k):
         p2 = search(tree, k-value, p1)
         if p2 is not None:
             return value, k-value, p1, p2
-    
+
     return None, None, None, None
 
 ```
@@ -997,7 +1138,7 @@ def solve(tree, k):
             return key1, key2, dict_tree[key1][0], dict_tree[key2][0]
 ```
 
-COMPLEXITY: O( n ) if no collisions 
+COMPLEXITY: O( n ) if no collisions
 WORSE O ( n^2 )
 
 ## 127
@@ -1023,7 +1164,7 @@ total(): returns the total number of hits recorded
 range(lower, upper): returns the number of hits that occurred between timestamps lower and upper (inclusive)
 Follow-up: What if our system has limited memory?
 
-## 134 
+## 134
 
 This problem was asked by Facebook.
 
@@ -1083,18 +1224,32 @@ For example, `carrace` should return true, since it can be rearranged to form `r
 Given a string, return the first recurring character in it, or null if there is no recurring character.
 For example, given the string "acbbac", return "b". Given the string "abcdef", return null.
 
-## 161 
+### Solution
+
+```python
+
+def solution(string):
+    seen = set()
+    for c in string:
+        if c in seen:
+             return c
+        seen.add(c)
+    return None
+
+```
+
+## 161
 
 This problem was asked by Facebook.
 
 Given a 32-bit integer, return the number with its bits reversed.
 
-For example, given the binary number 
+For example, given the binary number
 ```
 1111 0000 1111 0000 1111 0000 1111 0000
 ```
 
-return 
+return
 
 ```
 0000 1111 0000 1111 0000 1111 0000 1111
@@ -1151,15 +1306,30 @@ it should become:
 ### Solution (Python)
 
 ```python
-def flat(d): 
-    ret = {} 
-    for k,v in d.items(): 
-        if type(v)==dict: 
+def flat(d):
+    ret = {}
+    for k,v in d.items():
+        if type(v)==dict:
             for k2,v2 in flat(v).items():
-                ret[k+'.'+k2] = v2 
-        else: 
+                ret[k+'.'+k2] = v2
+        else:
             ret[k]=v
-    return ret 
+    return ret
+```
+
+#### Better solution ?
+
+```
+def flat(d):
+    ret = {}
+    for k,v in d.items():
+        try:
+            elem = flat(v)
+            for k2 in elem:
+                ret[k+'.'+k2] = elem[k2]
+        except AttributeError:
+            ret[k]=v
+    return ret
 ```
 
 You can assume keys do not contain dots in them, i.e. no clobbering will occur.
@@ -1189,8 +1359,11 @@ One instance of running this Markov chain might produce `{ 'a': 3012, 'b': 1656,
 ## 176
 
 This problem was asked by Bloomberg.
+
 Determine whether there exists a one-to-one character mapping from one string s1 to another s2.
+
 For example, given s1 = abc and s2 = bcd, return true since we can map a to b, b to c, and c to d.
+
 Given s1 = foo and s2 = bar, return false since the o cannot map to two characters.
 
 
@@ -1214,7 +1387,7 @@ For example, given the intervals (7, 9), (2, 4), (5, 8), return 1 as the last in
 The intervals are not necessarily sorted in any order.
 
 ## 189 (dup 489)
- 
+
 This problem was asked by Google.
 
 Given an array of elements, return the length of the longest subarray where all its elements are distinct.
@@ -1337,14 +1510,18 @@ Do this in `O(N)` time.
 This problem was asked by Bloomberg.
 
 There are N prisoners standing in a circle, waiting to be executed. The executions are carried out starting with the kth person, and removing every successive kth person going clockwise until there is no one left.
+
 Given N and k, write an algorithm to determine where a prisoner should stand in order to be the last survivor.
+
 For example, if N = 5 and k = 2, the order of executions would be [2, 4, 1, 5, 3], so you should return 3.
+
 Bonus: Find an O(log N) solution if k = 2.
 
 
-## 227 
+## 227
 
 This problem was asked by Facebook.
+
 Boggle is a game played on a 4 x 4 grid of letters. The goal is to find as many words as possible that can be formed by a sequence of adjacent letters in the grid, using each cell at most once. Given a game board and a dictionary of valid words, implement a Boggle solver.
 
 ## 231
@@ -1388,7 +1565,7 @@ Given a binary tree, determine whether or not it is height-balanced. A height-ba
 ## 244
 
 This problem was asked by Square.
-The Sieve of Eratosthenes is an algorithm used to generate all prime numbers smaller than N. The method is to take increasingly larger prime numbers, and mark their multiples as composite. 
+The Sieve of Eratosthenes is an algorithm used to generate all prime numbers smaller than N. The method is to take increasingly larger prime numbers, and mark their multiples as composite.
 For example, to find all primes less than 100, we would first mark [4, 6, 8, ...] (multiples of two), then [6, 9, 12, ...] (multiples of three), and so on. Once we have done this for all primes less than N, the unmarked numbers that remain will be prime.
 Implement this algorithm.
 Bonus: Create a generator that produces primes indefinitely (that is, without taking N as an input).
@@ -1439,10 +1616,10 @@ Given a graph, find its transitive closure.
 ## 273
 
 This problem was asked by Apple.
-A fixed point in an array is an element whose value is equal to its index. Given a sorted array of distinct elements, return a fixed point, if one exists. Otherwise, return False. 
+A fixed point in an array is an element whose value is equal to its index. Given a sorted array of distinct elements, return a fixed point, if one exists. Otherwise, return False.
 For example, given [-6, 0, 2, 40], you should return 2. Given [1, 5, 7, 8], you should return False.
 
-## 269 
+## 269
 
 This problem was asked by Microsoft.
 You are given an string representing the initial conditions of some dominoes. Each element can take one of three values:
@@ -1463,7 +1640,7 @@ A step word is formed by taking a given word, adding a letter, and anagramming t
 
 Given a dictionary of words and an input word, create a function that returns all valid step words.
 
-## 265 
+## 265
 
 This problem was asked by Atlassian.
 MegaCorp wants to give bonuses to its employees based on how many lines of codes they have written. They would like to give the smallest positive amount to each worker consistent with the constraint that if a developer has written more lines of code than their neighbor, they should receive more money.
@@ -1487,7 +1664,7 @@ Given a dictionary of character frequencies, build a Huffman tree, and use it to
 
 ## 258
 
- Daily Coding Problem 
+ Daily Coding Problem
 Good morning! Here's your coding interview problem for today.
 This problem was asked by Morgan Stanley.
 In Ancient Greece, it was common to write text with the first line going left to right, the second line going right to left, and continuing to go back and forth. This style was called "boustrophedon".
@@ -1526,20 +1703,64 @@ Given an integer N, construct all possible binary search trees with N nodes.
 This problem was asked by Netflix.
 Given an array of integers, determine whether it contains a Pythagorean triplet. Recall that a Pythogorean triplet (a, b, c) is defined by the equation a^2+ b^2= c^2.
 
-## 279                                                          
+## 279
 
 This problem was asked by Twitter.
-A classroom consists of N students, whose friendships can be represented in an adjacency list. For example, the following descibes a situation where 0 is friends with 1 and 2, 3 is friends with 6, and so on.
+
+A classroom consists of `N` students, whose friendships can be represented in an adjacency list. For example, the following descibes a situation where `0` is friends with `1` and `2`, `3` is friends with `6`, and so on.
+
+```python
 {0: [1, 2],
  1: [0, 5],
  2: [0],
  3: [6],
  4: [],
  5: [1],
- 6: [3]} 
-Each student can be placed in a friend group, which can be defined as the transitive closure of that student's friendship relations. In other words, this is the smallest set such that no student in the group has any friends outside this group. For the example above, the friend groups would be {0, 1, 2, 5}, {3, 6}, {4}.
+ 6: [3]}
+```
+
+Each student can be placed in a friend group, which can be defined as the transitive closure of that student's friendship relations. In other words, this is the smallest set such that no student in the group has any friends outside this group. For the example above, the friend groups would be `{0, 1, 2, 5}`, `{3, 6}`, `{4}`.
+
 Given a friendship list such as the one above, determine the number of friend groups in the class.
 
+### Solution
+
+```python
+
+_input = {0: [1, 2],
+ 1: [0, 5],
+ 2: [0],
+ 3: [6],
+ 4: [],
+ 5: [1],
+ 6: [3]}
+ 
+sets = {}
+ret = []
+ 
+for k,v in _input.items():
+    if k not in sets:
+        s = set([k]+v)
+        sets[k] = s
+        for vv in v:
+            sets[vv] = s
+        ret.append(s)
+    else:
+        for vv in v:
+            sets[k].add(vv)
+            sets[vv] = sets[k]
+
+print(sets)
+print(ret)
+
+```
+
+and the output will be
+
+```python
+{0: {0, 1, 2, 5}, 1: {0, 1, 2, 5}, 2: {0, 1, 2, 5}, 5: {0, 1, 2, 5}, 3: {3, 6}, 6: {3, 6}, 4: {4}}
+[{0, 1, 2, 5}, {3, 6}, {4}]
+```
 
 ## 283
 
@@ -1552,39 +1773,287 @@ Given an integer N, write a program that returns, in order, the first N regular 
 ## 290
 
 On a mysterious island there are creatures known as Quxes which come in three colors: red, green, and blue. One power of the Qux is that if two of them are standing next to each other, they can transform into a single creature of the third color.
+
 Given N Quxes standing in a line, determine the smallest number of them remaining after any possible sequence of such transformations.
+
 For example, given the input ['R', 'G', 'B', 'G', 'B'], it is possible to end up with a single Qux through the following steps:
-        Arrangement       |   Change
-----------------------------------------
-['R', 'G', 'B', 'G', 'B'] | (R, G) -> B
-['B', 'B', 'G', 'B']      | (B, G) -> R
-['B', 'R', 'B']           | (R, B) -> G
-['B', 'G']                | (B, G) -> R
-['R']                     |
+
+|        Arrangement       |   Change |
+|--------------------------|-------------|
+| ['R', 'G', 'B', 'G', 'B'] | (R, G) -> B |
+| ['B', 'B', 'G', 'B']      | (B, G) -> R |
+| ['B', 'R', 'B']           | (R, B) -> G |
+| ['B', 'G']                | (B, G) -> R |
+| ['R']                     | |
+
+### Solution
+
+```python
+from collections import deque
+
+_input = ['R', 'G', 'B', 'G', 'B']
+
+def son(a,b):
+    return {
+        frozenset(('R','G')) : 'B',
+        frozenset(('R','B')) : 'G',
+        frozenset(('B','G')) : 'R',
+    }[frozenset((a,b))]
+
+def solution(_input):
+    stack = deque([_input])
+    while stack:
+        sol = stack.pop()
+        final = True
+        for i,(a,b) in enumerate(zip(sol,sol[1:])):
+            if a!=b:
+                stack.append(sol[:i]+[son(a,b)]+sol[i+2:])
+                final = False
+        if final:
+            yield sol
+            
+print (min(solution(_input), key=len))
+
+```
 
 ## 298
 
 This problem was asked by Google.
+
 A girl is walking along an apple orchard with a bag in each hand. She likes to pick apples from each tree as she goes along, but is meticulous about not putting different kinds of apples in the same bag.
+
 Given an input describing the types of apples she will pass on her path, in order, determine the length of the longest portion of her path that consists of just two types of apple trees.
-For example, given the input [2, 1, 2, 3, 3, 1, 3, 5], the longest portion will involve types 1 and 3, with a length of four.
+
+For example, given the input `[2, 1, 2, 3, 3, 1, 3, 5]`, the longest portion will involve types 1 and 3, with a length of four.
+
+### Solution
+
+```python
+_input = [2, 1, 2, 3, 3, 1, 3, 5]
+
+def solution(_input):
+    sets = [set() for _ in range(len(_input)+1)]
+    for i, x in enumerate(_input+[None]):
+        for j in range(i+1):
+            try:
+                sets[j].add(x)
+            except AttributeError:
+                continue
+            if len(sets[j])>2:
+                yield i-j
+                sets[j] = None
+                
+print(max(solution(_input)))
+```
 
 ## 300
 
 This problem was asked by Uber.
-On election day, a voting machine writes data in the form (voter_id, candidate_id) to a text file. Write a program that reads this file as a stream and returns the top 3 candidates at any given time. If you find a voter voting more than once, report this as fraud.
+
+On election day, a voting machine writes data in the form (voter_id, candidate_id) to a text file.
+
+Write a program that reads this file as a stream and returns the top 3 candidates at any given time. If you find a voter voting more than once, report this as fraud.
+
+### Solution 1 
+
+```python
+from collections import Counter
+
+_input = [
+ #   (voter_id, candidate_id)
+ (1, 3),
+ (2, 3),
+ (3, 1),
+ (4, 1),
+ (1, 2),
+ (5, 2),
+ (6, 4),
+ (7, 3),
+ (11, 3),
+ (12, 3),
+ (13, 1),
+ (14, 1),
+ (111, 4),
+ (15, 4),
+ (16, 4),
+ (17, 4),
+ (18, 4), 
+ (19, 5),
+]
+
+def solution(_input):
+    voters = set()
+    top3 = Counter()
+    for voter_id, candidate_id in _input:
+        if voter_id in voters:
+            print(f"Fruad! {voter_id=},{candidate_id=}")
+            continue
+        voters.add(voter_id)
+        top3[candidate_id] += 1
+        yield [x[0] for x in top3.most_common(3)]
+
+for x in solution(_input):
+    print(x)
+```
+
+### Solution 2
+
+Without the use of the `Counter` class.
+
+```python
+_input = [
+ #   (voter_id, candidate_id)
+ (1, 3), (2, 3), (3, 1), (4, 1), (1, 2), (5, 1), (6, 4), (7, 3), (11, 3), (12, 3), (13, 1),
+ (14, 1), (111, 4), (15, 4), (16, 4), (17, 4), (18, 4), (19, 5),
+]
+
+class Top3:
+    def __init__(self):
+        self._cnt = dict()  # count the votes
+        self._seq = list()  # the list of the candidates, sorted by votes
+        self._positions = dict()  # the position of a candidate in the self._seq list
+        
+    def increment(self, k):   
+        if k not in self._cnt:
+            self._cnt[k] = 0
+        self._cnt[k] += 1
+        votes = self._cnt[k]
+        
+        if k not in self._positions:
+            self._seq.append([k, votes])
+            self._positions[k] = len(self._seq)-1
+        ptr = self._positions[k]
+        self._seq[ptr][1] = votes
+        
+        new_ptr = ptr
+        while new_ptr>0 and votes>self._seq[new_ptr-1][1]:  # linear search of the new position based on the new vote count. Yes, it is linear, but the counter is just incrementing by 1 so it can only move in the direction of the head of the list and cant jump 'a lot'
+            new_ptr -= 1
+        self._seq[new_ptr], self._seq[ptr] = self._seq[ptr], self._seq[new_ptr]
+        self._positions[k] = new_ptr
+        self._positions[self._seq[ptr][0]] = ptr
+    
+    def most_common(self):
+        return self._seq[:3]
+        
+    
+def solution(_input):
+    voters = set()
+    top3 = Top3()
+    for voter_id, candidate_id in _input:
+        if voter_id in voters:
+            print(f"Fruad! {voter_id=},{candidate_id=}")
+            continue
+        voters.add(voter_id)
+        top3.increment(candidate_id)
+        yield top3.most_common()
+
+for x in solution(_input):
+    print(x)
+
+```
 
 ## 303
 
 This problem was asked by Microsoft.
+
 Given a clock time in hh:mm format, determine, to the nearest degree, the angle between the hour and the minute hands.
+
 Bonus: When, during the course of a day, will the angle be zero?
+
+### Solution
+
+Some math
+
+``` 
+hours_degree = 360/12 * hours + 360/12/60 * minutes
+minutes_degree = 360/60 * minutes
+```
+The hours hand rotate by 30 degrees every hour plus half a degree for every minute of the hour
+The minutes hand rotate by 6 degrees every minute
+
+The angle is the absolute difference between the two.
+
+```python
+solution = abs(hours_degree - minutes_degree)  # remember to truncate to the nearest integer
+```
+
+#### Bonus
+
+We have to solve the equations:
+
+```
+30 * h + 0.5 * m = 6 * m
+
+30 * h = 5.5 * m
+
+m = 30 / 5.5 * h
+```
+
+this is true for 
+
+| h | m |
+| -- | -- |
+| 0 | 0 |
+| 1 | 5.45 |
+| 2 | 10.9 |
+| 3 | 16.36 |
+| 4 | 21.81 |
+| 5 | 27.27 |
+| 6 | 32.73 |
+| 7 | 38.18 |
+| 8 | 43.64 |
+| 9 | 49.09 |
+| 10 | 54.55 |
+| 11 | no solution |
 
 ## 305
 
 This problem was asked by Amazon.
+
 Given a linked list, remove all consecutive nodes that sum to zero. Print out the remaining nodes.
+
 For example, suppose you are given the input 3 -> 4 -> -7 -> 5 -> -6 -> 6. In this case, you should first remove 3 -> 4 -> -7, then -6 -> 6, leaving only 5.
+
+### Solution
+
+```python
+class Node:
+    def __init__(self, val, next=None):
+        self.value = val
+        self.next = next
+        
+    def __str__(self):
+        return "Node({},{})".format(self.value, self.next)
+        
+def generate_linkedlist(s):
+    start = ptr = None
+    for v in s.split(' -> '):
+        n = Node(int(v))
+        if start is None:
+            start = n
+        if ptr is not None:
+            ptr.next = n
+        ptr = n
+    return start
+
+
+def sol(linkedlist):
+    if linkedlist is None:
+        return None
+    ptr = linkedlist
+    _sum = 0
+    while ptr:
+        _sum += ptr.value
+        if _sum==0:
+            return sol(ptr.next)
+        ptr = ptr.next
+    linkedlist.next = sol(linkedlist.next)
+    return linkedlist
+    
+linkedlist = generate_linkedlist("3 -> 4 -> -7 -> 5 -> -6 -> 6")
+print (linkedlist)
+print (sol(linkedlist))
+```
 
 ## 307
 
@@ -1641,7 +2110,7 @@ You may decrement N to N - 1.
 If a * b = N, you may decrement N to the larger of a and b.
 For example, given 100, you can reach 1 in five steps with the following route: 100 -> 10 -> 9 -> 3 -> 2 -> 1.
 
-## 324 
+## 324
 
 This problem was asked by Amazon.
 Consider the following scenario: there are N mice and N holes placed at integer points along a line. Given this, find a method that maps mice to holes such that the largest number of steps any mouse takes is minimized.
@@ -1690,10 +2159,10 @@ vector<pair<int,int>> solve(int m, int n) {
 int main()
 {
     cout << "solve(705, 573)" << endl;
-   
+
     auto res = solve(705, 573);
     cout << res.size() << " solutions" << endl;
-    
+
     for (auto x = res.begin(); x != res.end();) {
         cout << x->first << "," << x->second;
         x++;
@@ -1729,7 +2198,7 @@ pair<int, string> compute(int a, int b, int c, int d, int seq) {
         (seq>>2) & 7,
         (seq) & 3,
     };
-    
+
     for (auto o: op) {
         switch(o) {
             case 0: a=a+b; b=c; c=d;
@@ -1771,7 +2240,7 @@ pair<int, string> compute(int a, int b, int c, int d, int seq) {
             default:
                 break;
         }
-        
+
     }
     ss << seq << " end";
     string sss = ss.str();
@@ -1813,7 +2282,7 @@ int main()
 
 This problem was asked by Google.
 
-Given a set of points (x, y) on a 2D cartesian plane, find the two closest points. 
+Given a set of points (x, y) on a 2D cartesian plane, find the two closest points.
 
 For example, given the points `[(1, 1), (-1, -1), (3, 4), (6, 1), (-1, -6), (-4, -3)`], return `[(-1, -1), (1, 1)]`.
 
@@ -1833,7 +2302,7 @@ print ( min(
 
 This problem was asked by Google.
 
-You are given an N by N matrix of random letters and a dictionary of words. 
+You are given an N by N matrix of random letters and a dictionary of words.
 
 Find the maximum number of words that can be packed on the board from the given dictionary.
 
@@ -1858,7 +2327,7 @@ and matrix:
  ['a', 'r', 'a']]
 ```
 
-Your function should return 3, since we can make the words 'eat', 'in', and 'rat' without them touching each other. 
+Your function should return 3, since we can make the words 'eat', 'in', and 'rat' without them touching each other.
 
 We could have alternatively made 'eat' and 'rain', but that would be incorrect since that's only 2 words.
 
@@ -1874,7 +2343,7 @@ For example, suppose we are given the string daily and k = 1. The best we can cr
 
 This problem was asked by Zillow.
 
-A ternary search tree is a trie-like data structure where each node may have up to three children. Here is an example which represents the words code, cob, be, ax, war, and we.
+A ternary search tree is a trie-like data structure where each node may have up to three children. Here is an example which represents the words `code`, `cob`, `be`, `ax`, `war`, and `we`.
 
 ```
        c
@@ -1882,8 +2351,8 @@ A ternary search tree is a trie-like data structure where each node may have up 
    b   o   w
  / |   |   |
 a  e   d   a
-|    / |   | \ 
-x   b  e   r  e  
+|    / |   | \
+x   b  e   r  e
 ```
 
 The tree is structured according to the following rules:
@@ -1892,7 +2361,7 @@ The tree is structured according to the following rules:
 * right child nodes link to words lexicographically later than the parent prefix
 * middle child nodes continue the current word
 
-For instance, since code is the first word inserted in the tree, and cob lexicographically precedes cod, cob is represented as a left child extending from cod.
+For instance, since `code` is the first word inserted in the tree, and `cob` lexicographically precedes `cod`, `cob` is represented as a left child extending from `cod`.
 
 Implement insertion and search functions for a ternary search tree.
 
@@ -1932,7 +2401,7 @@ A strobogrammatic number is a positive number that appears the same after being 
 Create a program that finds all strobogrammatic numbers with N digits.
 
 
-## 370 
+## 370
 
 This problem was asked by Postmates.
 
@@ -2052,7 +2521,7 @@ Given a list of integers L, find the maximum length of a sequence of consecutive
 
 For example, given L = [5, 2, 99, 3, 4, 1, 100], return 5 as we can build a sequence [1, 2, 3, 4, 5] which has length 5.
 
-## 374 
+## 374
 
 This problem was asked by Amazon.
 
@@ -2077,7 +2546,7 @@ Given a binary tree and an integer k, return whether there exists a root-to-leaf
 
 For example, given k = 18 and the following binary tree:
 
-``` 
+```
     8
    / \
   4   13
@@ -2086,6 +2555,31 @@ For example, given k = 18 and the following binary tree:
 ```
 Return `True` since the path `8 -> 4 -> 6` sums to `18`.
 
+### Solution
+
+Let's represent the tree as the usual list with node at index `i` that has the left node at `2*i+1` and the right node at `2*i+2`.
+
+```python
+tree = [8,4,13,2,6,None,19]
+
+def walk(t, current=0, s=0): # s is the accumulator of the sums until this node.
+    left = current*2+1
+    right = current*2+2
+    something_on_the_left = (left<len(t) and t[left] is not None)
+    something_on_the_right = (right<len(t) and t[right] is not None)
+    is_a_leaf = not something_on_the_left and not something_on_the_right
+    if is_a_leaf:
+        yield s+t[current]
+    else:
+        if something_on_the_left:
+            yield from walk(t, left, s+t[current])
+        if something_on_the_right:
+            yield from walk(t, right, s+t[current])
+    
+assert(18 in walk(tree)) == True
+assert(17 in walk(tree)) == False
+
+```
 
 ## 399
 
@@ -2107,6 +2601,35 @@ Return the following 3 partitions:
 
 Which each add up to 8.
 
+### Solution
+
+```python
+l = [3, 5, 8, 0, 8]
+
+def sol(l):
+    ret = []
+    s = sum(l)
+    if s%3 != 0:
+        return None
+    target = s // 3 
+    start = 0
+    _sum = 0
+    for i,v in enumerate(l):
+        if _sum+v==target:
+            ret.append(l[start:i+1])
+            _sum = 0
+            start = i+1
+        elif _sum+v>target or len(ret)>3:
+            return None
+        else:
+            _sum += v
+    if len(ret) != 3:
+        return None
+    return ret 
+    
+print(sol(l))
+```
+
 ## 401
 
 This problem was asked by Twitter.
@@ -2115,6 +2638,16 @@ A permutation can be specified by an array `P`, where `P[i]` represents the loca
 
 Given an array and a permutation, apply the permutation to the array. For example, given the array `["a", "b", "c"]` and the permutation `[2, 1, 0]`, return `["c", "b", "a"]`.
 
+### Solution
+
+```python
+l = ["a", "b", "c"]
+p = [2, 1, 0]
+
+sol = [l[x] for x in p]
+
+print(sol)
+```
 
 ## 402 same as 362
 
@@ -2131,6 +2664,8 @@ This problem was asked by Two Sigma.
 
 Using a function rand5() that returns an integer from 1 to 5 (inclusive) with uniform probability, implement a function rand7() that returns an integer from 1 to 7 (inclusive).
 
+[_See 71 reverse_](#71-reverse)
+
 ## 404
 
 This problem was asked by Snapchat.
@@ -2146,7 +2681,7 @@ This problem was asked by Google.
 You are in an infinite 2D grid where you can move in any of the 8 directions:
 
 ```
- (x,y) to    
+ (x,y) to
     (x+1, y),
     (x - 1, y),
     (x, y+1),
@@ -2166,14 +2701,6 @@ Output: 2
 
 It takes 1 step to move from `(0, 0)` to `(1, 1)`. It takes one more step to move from `(1, 1)` to `(1, 2)`.
 
-## 417
-
-This problem was asked by Amazon.
-
-Given a linked list, remove all consecutive nodes that sum to zero. Print out the remaining nodes.
-
-For example, suppose you are given the input 3 -> 4 -> -7 -> 5 -> -6 -> 6. In this case, you should first remove 3 -> 4 -> -7, then -6 -> 6, leaving only 5.
-
 ## 418
 
 This problem was asked by Atlassian.
@@ -2182,12 +2709,105 @@ MegaCorp wants to give bonuses to its employees based on how many lines of codes
 
 Given an array representing a line of seats of employees at MegaCorp, determine how much each one should get paid.
 
-For example, given [10, 40, 200, 1000, 60, 30], you should return [1, 2, 3, 4, 2, 1].
+For example, given `[10, 40, 200, 1000, 60, 30]`, you should return `[1, 2, 3, 4, 2, 1]`.
+
+Given `[100, 40, 20, 1000, 60, 30]`, you should return `[3, 2, 1, 3, 2, 1]`.
+
+### Solution
+
+Let's assume there are never two employees with the same amount of lines of code, one aside the other.
+
+```python
+l = [10, 40, 200, 1000, 60, 30]
+
+def sol(l):
+    if not l:
+        return l
+    
+    if len(l) == 1:
+        return [1]
+    
+    mins = []  # list of the local minimums
+    maxs = []  # list of the local maximums
+    
+    for i,x in enumerate(l):
+        if (i==0 or x<l[i-1]) and (i==len(l)-1 or x<l[i+1]):
+            mins.append(i)
+        if (i==0 or x>l[i-1]) and (i==len(l)-1 or x>l[i+1]):
+            maxs.append(i)
+
+    ret = [None] * len(l)
+    
+    for m in mins:
+        # ret[m]=1
+        if maxs[0]<m:  # descending ramp
+            M = maxs.pop(0)
+            for i in range(m-M+1):
+                if m-i>=0 and (ret[m-i] is None or ret[m-i]<i+1):
+                    ret[m-i] = i+1
+        # ascending ramp
+        if maxs:
+            M = maxs[0]
+            for i in range(M-m+1):
+                if m+1<len(ret) and (ret[m+i] is None or ret[m+i]<i+1):
+                    ret[m+i] = i+1
+    return ret  
+```
+
+If we have the same value side by side, we can get rid of it and put it back later.
+
+```python
+l = [10, 40, 200, 200, 200, 1000, 60, 30]
+
+def remove_doubles(l):
+    remove = set()
+    for i,(a,b) in enumerate(zip(l,l[1:])):
+        if a==b:
+            remove.add(i)
+            
+    return remove, [x for i,x in enumerate(l) if i not in remove]        
+
+def sol(l):
+    if not l:
+        return l
+    
+    if len(l) == 1:
+        return [1]
+    
+    doubles, lines = remove_doubles(l)
+
+    mins = []
+    maxs = []
+    
+    for i,x in enumerate(lines):
+        if (i==0 or x<lines[i-1]) and (i==len(lines)-1 or x<lines[i+1]):
+            mins.append(i)
+        if (i==0 or x>lines[i-1]) and (i==len(lines)-1 or x>lines[i+1]):
+            maxs.append(i)
+
+    ret = [None] * len(lines)
+    
+    for m in mins:
+        # ret[m]=1
+        if maxs[0]<m:  # descending ramp
+            M = maxs.pop(0)
+            for i in range(m-M+1):
+                if m-i>=0 and (ret[m-i] is None or ret[m-i]<i+1):
+                    ret[m-i] = i+1
+        # ascending ramp
+        if maxs:
+            M = maxs[0]
+            for i in range(M-m+1):
+                if m+1<len(ret) and (ret[m+i] is None or ret[m+i]<i+1):
+                    ret[m+i] = i+1
+
+    for i in sorted(doubles):
+        ret[i+1:i+1] = ret[i:i+1]
+
+    return ret
+```
 
 ## 419
-
-
-Good morning! Here's your coding interview problem for today.
 
 This problem was asked by PagerDuty.
 
@@ -2199,16 +2819,6 @@ You may decrement N to N - 1.
 If a * b = N, you may decrement N to the larger of a and b.
 For example, given 100, you can reach 1 in five steps with the following route: 100 -> 10 -> 9 -> 3 -> 2 -> 1.
 
-## 420
-
-This problem was asked by Microsoft.
-
-A number is considered perfect if its digits sum up to exactly 10.
-
-Given a positive integer n, return the n-th perfect number.
-
-For example, given 1, you should return 19. Given 2, you should return 28.
-
 ## 422
 
 This problem was asked by Salesforce.
@@ -2216,6 +2826,105 @@ This problem was asked by Salesforce.
 Write a program to merge two binary trees. Each node in the new tree should hold a value equal to the sum of the values of the corresponding nodes of the input trees.
 
 If only one input tree has a node in a given position, the corresponding node in the new tree should match that input node.
+
+### Solution
+
+```python
+class Node:
+    def __init__(self, val, left=None, right=None):
+        self.value = val
+        self.left = left
+        self.right = right
+        
+    def __str__(self):
+        return "Node(value:{},\n\tleft:{},\n\tright:{}\n)".format(self.value, self.left, self.right)
+        
+a = Node(13, Node(8), Node(7, Node(1), Node(3)))
+b = Node(1, Node(18, right=Node(1)), Node(7, Node(1), Node(3)))
+
+def walk(tree, idx = 0):
+    if tree:
+        yield (idx, tree.value)
+        if tree.left:
+            yield from walk(tree.left, idx*2+1)
+        if tree.right:
+            yield from walk(tree.right, idx*2+2)
+
+def sol(a, b):
+    sum_tree = dict(walk(a))
+    size = 0
+    for k, v in walk(b):
+        if k not in sum_tree:
+            sum_tree[k] = 0
+        sum_tree[k] += v    
+        if k>size:
+            size=k
+    
+    # this is an additional step, you could just keep the `sum_tree` dict as result
+    ret = [None] * (size+1)
+    for k, v in sum_tree.items():
+        ret[k] = v
+    return ret
+    
+print(sol(a,b))
+# >>> [14, 26, 14, None, 1, 2, 6]
+```
+
+The result is the usual binary tree with the root at 0, left node at `n*2+1`, and right node at `n*2+2`
+
+If you want to go back to a `Node` tree
+
+```python
+def list_to_nodes(l, idx=0):
+    if idx<len(l) and l[idx] is not None:
+        return Node(l[idx], 
+            list_to_nodes(l, idx*2+1),
+            list_to_nodes(l, idx*2+2),
+        )
+
+print(list_to_nodes(sol(a,b)))
+# Node(value:14,
+# 	left:Node(value:26,
+#   	left:None,
+#    	right:Node(value:1,
+#        	left:None,
+#       	right:None
+#       )
+#   ),
+# 	right:Node(value:14,
+# 	    left:Node(value:2,
+# 	        left:None,
+# 	        right:None
+#       ),
+# 	    right:Node(value:6,
+# 	        left:None,
+# 	        right:None
+#       )
+#   )
+# )
+```
+
+Alternatively we can use a `dict` as intermediate data structure, instead of our list-tree
+
+```python
+def sol(a, b):
+    sum_tree = dict(walk(a))
+    for k, v in walk(b):
+        if k not in sum_tree:
+            sum_tree[k] = 0
+        sum_tree[k] += v    
+
+    return sum_tree
+    
+print(sol(a,b))
+# >>> {0: 14, 1: 26, 2: 14, 5: 2, 6: 6, 4: 1}
+def list_to_nodes(tree, idx=0):
+    if idx in tree:
+        return Node(tree[idx], 
+            list_to_nodes(tree, idx*2+1),
+            list_to_nodes(tree, idx*2+2),
+        )
+```
 
 ## 423
 
@@ -2374,7 +3083,7 @@ For example, given the input `['R', 'G', 'B', 'G', 'B']`, it is possible to end 
 # evoltion rules
 son={
     frozenset({'R','G'}): 'B',
-    frozenset({'R','B'}): 'G', 
+    frozenset({'R','B'}): 'G',
     frozenset({'B','G'}): 'R'
 }
 
@@ -2408,7 +3117,7 @@ def solution(l):
 ['B', 'B']
 >>> list(solution(_in))
 [['R', 'R'], ['B', 'B'], ['G', 'G'], ['R', 'R', 'R', 'R'], ['B', 'B', 'B', 'B'], ['G', 'G', 'G', 'G']]
->>> 
+>>>
 
 # example from the problem
 >>> list(solution(list('RGBGB')))
@@ -2481,7 +3190,7 @@ This problem was asked by Microsoft.
 
 Given an array of numbers and a number k, determine if there are three entries in the array which add up to the specified number k. For example, given `[20, 303, 3, 4, 25]` and `k = 49`, return `true` as 20 + 4 + 25 = 49.
 
-## 539 
+## 539
 
 This problem was asked by Pandora.
 
@@ -2544,6 +3253,48 @@ For example, the following tree has 5 unival subtrees:
 Given n numbers, find the greatest common denominator between them.
 
 For example, given the numbers `[42, 56, 14]`, return `14`.
+
+### Solution
+
+```python
+from collections import defaultdict
+
+l = [42, 56, 14]
+
+def prime_fact(n):
+    ret = defaultdict(int)
+    m = 2
+    while n>1:
+        while n % m == 0:
+            n //= m
+            ret[m] += 1
+        m += 1 if m==2 else 2
+    return ret
+    
+assert prime_fact(84)=={2: 2, 3: 1, 7: 1}
+
+def sol(l):
+    ret = None
+    for x in l:
+        if ret is None:
+            ret = prime_fact(x)
+        else:
+            factors = prime_fact(x)
+            # merge ret and factors into new based on the GCD rules
+            new = {}
+            for k,v in ret.items():
+                if k in factors:
+                    new[k] = min(v, factors[k])
+            ret = new
+    ret_n = 1
+    if ret:
+        for k,v in ret.items():
+            ret_n *= k**v
+    
+    return ret_n
+
+print(sol(l))
+```
 
 ## 671
 
