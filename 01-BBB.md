@@ -3230,7 +3230,7 @@ Implement a job scheduler which takes in a function f and an integer n, and call
 
 ## 644
 
-A unival tree (which stands for "universal value") is a tree where all nodes under it have the same value.
+A unival tree (which stands for "universal value tree") is a tree where all nodes under it have the same value.
 
 Given the root to a binary tree, count the number of unival subtrees.
 
@@ -3246,9 +3246,48 @@ For example, the following tree has 5 unival subtrees:
  1   1
  ```
 
- ## 662
+### Solution
 
- This problem was asked by Amazon.
+```python
+tree = (0,
+  (1,None,None),
+  (0,
+    (1,
+      (1,None,None),
+      (1,None,None)
+    ),
+    (0,None,None)
+  )
+)
+
+def is_unival(node):
+    if node is None:
+        return True
+    v = node[0]
+    left = node[1]
+    right = node[2]
+    return (
+        (left is None and right is None) or 
+        (left is None and v==right[0] and is_unival(right)) or 
+        (right is None and v==left[0] and is_unival(left)) or 
+        (v==left[0]==right[0] and is_unival(left) and is_unival(right))
+    )
+
+def sol(node):
+    if node is None:
+        return 0
+    ret = 0
+    if is_unival(node):
+        ret = 1
+    return ret + sol(node[1]) + sol(node[2])
+
+>>> sol(tree)
+5
+
+```
+## 662
+
+This problem was asked by Amazon.
 
 Given n numbers, find the greatest common denominator between them.
 
