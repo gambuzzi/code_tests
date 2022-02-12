@@ -3190,6 +3190,43 @@ This problem was asked by Microsoft.
 
 Given an array of numbers and a number k, determine if there are three entries in the array which add up to the specified number k. For example, given `[20, 303, 3, 4, 25]` and `k = 49`, return `true` as 20 + 4 + 25 = 49.
 
+```python
+
+
+from collections import defaultdict
+
+def find2(c, mp):
+    for n in c:
+        c[n] -= 1
+        if mp-n in c and c[mp-n] > 0:
+            c[n] += 1
+            return n, mp-n
+        c[n] += 1
+    return None, None
+
+def sol(arr, k):
+    counter = defaultdict(int)
+    for n in arr:
+        counter[n] += 1
+
+    for n in arr:
+        mp = k-n
+        counter[n] -= 1
+        m,p = find2(counter, mp)
+        counter[n] += 1
+        if m is not None and p is not None:
+            return n, m, p
+
+    return None, None, None
+
+>>> sol([20, 303, 3, 4, 25], 49)
+(20, 4, 25)
+
+>>> sol([20, 20, 3, 4, 25], 44)
+(20, 20, 4)
+```
+
+
 ## 539
 
 This problem was asked by Pandora.
@@ -3221,12 +3258,6 @@ and
 ```
 
 return 6.
-
-## 600
-
-This problem was asked by Apple.
-
-Implement a job scheduler which takes in a function f and an integer n, and calls f after n milliseconds.
 
 ## 644
 
@@ -3285,6 +3316,7 @@ def sol(node):
 5
 
 ```
+
 ## 662
 
 This problem was asked by Amazon.
